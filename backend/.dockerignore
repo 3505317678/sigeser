@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+staticfiles/
+tests/
+requirements-dev.txt
+pytest.ini
+.env
+*.env
+.venv/
+venv/

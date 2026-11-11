@@ -1,0 +1,116 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--f-texto);
+  font-size: var(--t-md);
+  line-height: 1.5;
+  color: var(--c-texto);
+  background: var(--c-fondo);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--c-texto);
+}
+
+h1 {
+  font-size: var(--t-2xl);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: var(--t-xl);
+}
+
+h3 {
+  font-size: var(--t-lg);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--c-base-600);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--c-base-800);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--foco);
+  border-radius: var(--r-control);
+}
+
+.solo-lector {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.saltar-contenido {
+  position: absolute;
+  left: var(--s-4);
+  top: -48px;
+  z-index: 100;
+  padding: var(--s-2) var(--s-4);
+  background: var(--c-senal);
+  color: var(--c-base-900);
+  font-weight: 600;
+  border-radius: var(--r-control);
+  transition: top var(--transicion);
+}
+
+.saltar-contenido:focus {
+  top: var(--s-2);
+}
+
+.texto-2 {
+  color: var(--c-texto-2);
+}
+
+.texto-3 {
+  color: var(--c-texto-3);
+}
+
+.pequeno {
+  font-size: var(--t-sm);
+}
+
+.cifra {
+  font-family: var(--f-condensada);
+  font-variant-numeric: tabular-nums;
+}

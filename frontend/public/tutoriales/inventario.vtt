@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:02.176 --> 00:00:05.523
+En Inventario, el contador del menú avisa cuántos repuestos están bajo el mínimo.
+
+2
+00:00:05.523 --> 00:00:13.654
+Cuando llega una compra, registre una Entrada con el número de la factura.
+
+3
+00:00:13.654 --> 00:00:22.657
+Para corregir el conteo o registrar una unidad dañada, use un Ajuste con número negativo.
+
+4
+00:00:22.657 --> 00:00:25.994
+El kardex guarda cada movimiento con su fecha, usuario y existencias resultantes. Nada se borra.

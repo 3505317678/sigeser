@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:03.690 --> 00:00:15.603
+Con la orden en reparación, registre cada actividad con las horas empleadas.
+
+2
+00:00:15.603 --> 00:00:23.089
+Si falta una pieza, pulse Esperar repuestos e indique cuál: la orden queda detenida y visible en el panel.
+
+3
+00:00:23.089 --> 00:00:25.439
+Cuando el repuesto entra al inventario, pulse Reanudar reparación.
+
+4
+00:00:25.439 --> 00:00:31.622
+Agregue el repuesto: se descuenta del inventario y se suma al total de la orden.
+
+5
+00:00:31.622 --> 00:00:36.562
+Al terminar, envíe la orden a verificación con el costo final de la mano de obra.
+
+6
+00:00:36.562 --> 00:00:39.263
+Después de probar el equipo, el técnico registra la verificación y la orden queda lista para entrega.

@@ -1,0 +1,97 @@
+/*
+ * Tokens de diseño de SIGESER.
+ * Base: verde azulado de máscara de soldadura (placa electrónica). Señal: ámbar de etiqueta, reservado
+ * para lo que exige atención (órdenes vencidas, stock bajo). Cada estado de la orden tiene un color fijo.
+ */
+:root {
+  /* Color base */
+  --c-base-900: #0b2e2f;
+  --c-base-800: #0f3d3e;
+  --c-base-700: #155354;
+  --c-base-600: #1d6b6b;
+  --c-base-100: #dceae8;
+  --c-base-50: #eef5f4;
+  --c-senal: #d9920f;
+  --c-senal-texto: #8a5a00;
+  --c-senal-fondo: #fdf3df;
+
+  /* Superficies y texto */
+  --c-fondo: #f2f4f3;
+  --c-superficie: #ffffff;
+  --c-superficie-2: #f7f9f8;
+  --c-borde: #d8dedc;
+  --c-borde-fuerte: #b9c3c0;
+  --c-texto: #18211f;
+  --c-texto-2: #4a5754;
+  --c-texto-3: #6b7774;
+  --c-texto-inverso: #e8f1ef;
+
+  /* Semánticos */
+  --c-exito: #1f7a4d;
+  --c-exito-fondo: #e3f3ea;
+  --c-aviso: #8a5a00;
+  --c-aviso-fondo: #fdf3df;
+  --c-error: #b42318;
+  --c-error-fondo: #fdecea;
+  --c-info: #2563a8;
+  --c-info-fondo: #e7f0fa;
+
+  /* Estados de la orden (solo punto y borde; el texto siempre es oscuro) */
+  --e-recibida: #5a6b7b;
+  --e-diagnostico: #2f6fb0;
+  --e-aprobacion: #c58a12;
+  --e-espera: #a15c1c;
+  --e-reparacion: #0f6e6a;
+  --e-verificacion: #6b4fa3;
+  --e-lista: #1f7a4d;
+  --e-entregada: #3f4a48;
+  --e-cancelada: #b42318;
+
+  /* Gráficos: par categórico validado (CVD ΔE 21.4, visión normal ΔE 27.6, contraste >= 3:1); magnitudes en un solo tono */
+  --g-serie-1: #1b6fae;
+  --g-serie-2: #c0661a;
+  --g-magnitud: #1d6b6b;
+  --g-rejilla: #e3e8e6;
+  --g-eje: #6b7774;
+
+  /* Tipografía: Barlow (inspirada en señalización vial) y Barlow Condensed para códigos y cifras */
+  --f-texto: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-condensada: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-md: 0.9375rem;
+  --t-lg: 1.0625rem;
+  --t-xl: 1.375rem;
+  --t-2xl: 1.75rem;
+  --t-3xl: 2.5rem;
+
+  /* Espaciado (múltiplos de 4 px) */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+
+  /* Radios según jerarquía: controles pequeños, paneles medianos, diálogos mayores */
+  --r-control: 6px;
+  --r-panel: 10px;
+  --r-dialogo: 14px;
+  --r-pastilla: 999px;
+
+  --sombra-dialogo: 0 24px 48px -12px rgb(11 46 47 / 0.35);
+  --sombra-flotante: 0 8px 20px -6px rgb(11 46 47 / 0.25);
+  --foco: 0 0 0 2px var(--c-superficie), 0 0 0 4px var(--c-senal);
+
+  --ancho-menu: 248px;
+  --alto-barra: 60px;
+  --transicion: 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transicion: 0ms;
+  }
+}

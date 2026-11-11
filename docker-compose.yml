@@ -1,0 +1,73 @@
+# SIGESER: despliegue completo con Docker Compose.
+# Solo el servicio "web" (Nginx) publica un puerto; PostgreSQL y Gunicorn quedan en la red interna.
+name: sigeser
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sigeser}
+      POSTGRES_USER: ${POSTGRES_USER:-sigeser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD en el archivo .env}
+      TZ: America/Bogota
+    volumes:
+      - datos_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    security_opt:
+      - no-new-privileges:true
+    networks: [interna]
+
+  backend:
+    build: ./backend
+    image: sigeser-backend:1.2.0
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+      DJANGO_DEBUG: "0"
+      DJANGO_NUM_PROXIES: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - estaticos:/app/staticfiles
+      - medios:/app/media   # fotos de las órdenes (RF-33): fuera de la imagen y fuera de Nginx
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    networks: [interna]
+
+  web:
+    build: ./frontend
+    image: sigeser-web:1.2.0
+    restart: unless-stopped
+    ports:
+      - "${SIGESER_PUERTO:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - estaticos:/srv/static:ro
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    networks: [interna]
+
+volumes:
+  datos_pg:
+  estaticos:
+  medios:
+
+networks:
+  interna:

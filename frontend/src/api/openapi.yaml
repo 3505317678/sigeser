@@ -1,0 +1,3961 @@
+openapi: 3.0.3
+info:
+  title: API de SIGESER
+  version: 1.0.0
+  description: Sistema de Gestión y Seguimiento de Servicios Técnicos
+paths:
+  /api/v1/auditoria:
+    get:
+      operationId: v1_auditoria_list
+      parameters:
+      - in: query
+        name: accion
+        schema:
+          type: string
+      - in: query
+        name: desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: entidad
+        schema:
+          type: string
+      - in: query
+        name: hasta
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: usuario
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRegistroAuditoriaList'
+          description: ''
+  /api/v1/auditoria/{id}:
+    get:
+      operationId: v1_auditoria_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este registro auditoria.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistroAuditoria'
+          description: ''
+  /api/v1/auth/cambiar-contrasena:
+    post:
+      operationId: v1_auth_cambiar_contrasena_create
+      description: RF-05.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambioContrasenaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CambioContrasenaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CambioContrasenaRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/csrf:
+    get:
+      operationId: v1_auth_csrf_retrieve
+      description: Entrega la cookie CSRF que la SPA debe reenviar en la cabecera
+        X-CSRFToken.
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login:
+    post:
+      operationId: v1_auth_login_create
+      description: 'UC-01 / Figura 4: autenticación con bloqueo por intentos y límite
+        de tasa por IP.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+          description: ''
+        '401':
+          description: No response body
+        '429':
+          description: No response body
+  /api/v1/auth/logout:
+    post:
+      operationId: v1_auth_logout_create
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/yo:
+    get:
+      operationId: v1_auth_yo_retrieve
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Perfil'
+          description: ''
+  /api/v1/clientes:
+    get:
+      operationId: v1_clientes_list
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: documento
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: tipo_documento
+        schema:
+          type: string
+          enum:
+          - CC
+          - CE
+          - NIT
+          - PAS
+        description: |-
+          * `CC` - Cédula de ciudadanía
+          * `CE` - Cédula de extranjería
+          * `NIT` - NIT
+          * `PAS` - Pasaporte
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClienteListaList'
+          description: ''
+    post:
+      operationId: v1_clientes_create
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/v1/clientes/{id}:
+    get:
+      operationId: v1_clientes_retrieve
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+    put:
+      operationId: v1_clientes_update
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+    patch:
+      operationId: v1_clientes_partial_update
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedClienteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedClienteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedClienteRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/v1/clientes/{id}/desactivar:
+    post:
+      operationId: v1_clientes_desactivar_create
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/v1/clientes/{id}/equipos:
+    post:
+      operationId: v1_clientes_equipos_create
+      description: RF-08 y RF-09. Sin borrado físico (RN-11).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este cliente.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ClienteRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/v1/equipos:
+    get:
+      operationId: v1_equipos_list
+      description: RF-10 y RF-11.
+      parameters:
+      - in: query
+        name: cliente
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEquipoList'
+          description: ''
+  /api/v1/equipos/{id}:
+    get:
+      operationId: v1_equipos_retrieve
+      description: RF-10 y RF-11.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este equipo.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipo'
+          description: ''
+    put:
+      operationId: v1_equipos_update
+      description: RF-10 y RF-11.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este equipo.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EquipoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EquipoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipo'
+          description: ''
+    patch:
+      operationId: v1_equipos_partial_update
+      description: RF-10 y RF-11.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este equipo.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEquipoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEquipoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEquipoRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipo'
+          description: ''
+  /api/v1/equipos/{id}/historial:
+    get:
+      operationId: v1_equipos_historial_retrieve
+      description: RF-10 y RF-11.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este equipo.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipo'
+          description: ''
+  /api/v1/ordenes:
+    get:
+      operationId: v1_ordenes_list
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: query
+        name: activas
+        schema:
+          type: boolean
+      - in: query
+        name: cliente
+        schema:
+          type: integer
+      - in: query
+        name: codigo
+        schema:
+          type: string
+      - in: query
+        name: desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: equipo
+        schema:
+          type: integer
+      - in: query
+        name: estado
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - CANCELADA
+            - ENTREGADA
+            - EN_DIAGNOSTICO
+            - EN_ESPERA_REPUESTOS
+            - EN_REPARACION
+            - EN_VERIFICACION
+            - LISTA_PARA_ENTREGA
+            - PENDIENTE_APROBACION
+            - RECIBIDA
+        description: |-
+          * `RECIBIDA` - Recibida
+          * `EN_DIAGNOSTICO` - En diagnóstico
+          * `PENDIENTE_APROBACION` - Pendiente de aprobación
+          * `EN_ESPERA_REPUESTOS` - En espera de repuestos
+          * `EN_REPARACION` - En reparación
+          * `EN_VERIFICACION` - En verificación
+          * `LISTA_PARA_ENTREGA` - Lista para entrega
+          * `ENTREGADA` - Entregada
+          * `CANCELADA` - Cancelada
+        explode: true
+        style: form
+      - in: query
+        name: hasta
+        schema:
+          type: string
+          format: date
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - in: query
+        name: prioridad
+        schema:
+          type: string
+          enum:
+          - ALTA
+          - BAJA
+          - MEDIA
+        description: |-
+          * `BAJA` - Baja
+          * `MEDIA` - Media
+          * `ALTA` - Alta
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      - in: query
+        name: tecnico
+        schema:
+          type: integer
+      - in: query
+        name: vencidas
+        schema:
+          type: boolean
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrdenListaList'
+          description: ''
+    post:
+      operationId: v1_ordenes_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenCrearRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrdenCrearRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrdenCrearRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenCrear'
+          description: ''
+  /api/v1/ordenes/{id}:
+    get:
+      operationId: v1_ordenes_retrieve
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+    put:
+      operationId: v1_ordenes_update
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrdenEditarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrdenEditarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrdenEditarRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEditar'
+          description: ''
+    patch:
+      operationId: v1_ordenes_partial_update
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrdenEditarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrdenEditarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrdenEditarRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenEditar'
+          description: ''
+  /api/v1/ordenes/{id}/actividades:
+    post:
+      operationId: v1_ordenes_actividades_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActividadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ActividadRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ActividadRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/aprobacion:
+    post:
+      operationId: v1_ordenes_aprobacion_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AprobacionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AprobacionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AprobacionRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/asignar-tecnico:
+    post:
+      operationId: v1_ordenes_asignar_tecnico_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsignarTecnicoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AsignarTecnicoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AsignarTecnicoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/cancelar:
+    post:
+      operationId: v1_ordenes_cancelar_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CancelarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CancelarRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/comprobante:
+    get:
+      operationId: v1_ordenes_comprobante_retrieve
+      description: 'UC-18 / RF-13: comprobante PDF de recepción o de entrega.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      - in: query
+        name: tipo
+        schema:
+          type: string
+          enum:
+          - entrega
+          - recepcion
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/ordenes/{id}/diagnostico:
+    post:
+      operationId: v1_ordenes_diagnostico_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DiagnosticoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DiagnosticoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/entrega:
+    post:
+      operationId: v1_ordenes_entrega_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntregaRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EntregaRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EntregaRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/enviar-verificacion:
+    post:
+      operationId: v1_ordenes_enviar_verificacion_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnviarVerificacionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnviarVerificacionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnviarVerificacionRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/espera:
+    post:
+      operationId: v1_ordenes_espera_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservacionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ObservacionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ObservacionRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/fotos:
+    get:
+      operationId: v1_ordenes_fotos_list
+      description: 'RF-33: evidencia fotográfica del equipo, en orden cronológico.'
+      parameters:
+      - in: query
+        name: activas
+        schema:
+          type: boolean
+      - in: query
+        name: cliente
+        schema:
+          type: integer
+      - in: query
+        name: codigo
+        schema:
+          type: string
+      - in: query
+        name: desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: equipo
+        schema:
+          type: integer
+      - in: query
+        name: estado
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - CANCELADA
+            - ENTREGADA
+            - EN_DIAGNOSTICO
+            - EN_ESPERA_REPUESTOS
+            - EN_REPARACION
+            - EN_VERIFICACION
+            - LISTA_PARA_ENTREGA
+            - PENDIENTE_APROBACION
+            - RECIBIDA
+        description: |-
+          * `RECIBIDA` - Recibida
+          * `EN_DIAGNOSTICO` - En diagnóstico
+          * `PENDIENTE_APROBACION` - Pendiente de aprobación
+          * `EN_ESPERA_REPUESTOS` - En espera de repuestos
+          * `EN_REPARACION` - En reparación
+          * `EN_VERIFICACION` - En verificación
+          * `LISTA_PARA_ENTREGA` - Lista para entrega
+          * `ENTREGADA` - Entregada
+          * `CANCELADA` - Cancelada
+        explode: true
+        style: form
+      - in: query
+        name: hasta
+        schema:
+          type: string
+          format: date
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - in: query
+        name: prioridad
+        schema:
+          type: string
+          enum:
+          - ALTA
+          - BAJA
+          - MEDIA
+        description: |-
+          * `BAJA` - Baja
+          * `MEDIA` - Media
+          * `ALTA` - Alta
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - in: query
+        name: tecnico
+        schema:
+          type: integer
+      - in: query
+        name: vencidas
+        schema:
+          type: boolean
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Foto'
+          description: ''
+    post:
+      operationId: v1_ordenes_fotos_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubirFotoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Foto'
+          description: ''
+  /api/v1/ordenes/{id}/fotos/{foto_id}/imagen:
+    get:
+      operationId: v1_ordenes_fotos_imagen_retrieve
+      description: Sirve la imagen solo a quien puede ver la orden; las fotos nunca
+        quedan en una carpeta pública.
+      parameters:
+      - in: path
+        name: foto_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      - in: query
+        name: tamano
+        schema:
+          type: string
+          enum:
+          - completa
+          - miniatura
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/ordenes/{id}/iniciar-diagnostico:
+    post:
+      operationId: v1_ordenes_iniciar_diagnostico_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/reanudar:
+    post:
+      operationId: v1_ordenes_reanudar_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/repuestos:
+    post:
+      operationId: v1_ordenes_repuestos_create
+      description: UC-13 / Figura 6. Responde 409 con el stock disponible si no alcanza.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgregarRepuestoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AgregarRepuestoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AgregarRepuestoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepuestoUtilizado'
+          description: ''
+  /api/v1/ordenes/{id}/repuestos/{uso_id}/devolver:
+    post:
+      operationId: v1_ordenes_repuestos_devolver_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      - in: path
+        name: uso_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/ordenes/{id}/verificacion:
+    post:
+      operationId: v1_ordenes_verificacion_create
+      description: UC-07 a UC-18. Las transiciones de estado se hacen solo con las
+        acciones, nunca editando el estado.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este orden servicio.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificacionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerificacionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerificacionRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdenDetalle'
+          description: ''
+  /api/v1/permisos:
+    get:
+      operationId: v1_permisos_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permiso'
+          description: ''
+  /api/v1/permisos/{id}:
+    get:
+      operationId: v1_permisos_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este permiso.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permiso'
+          description: ''
+  /api/v1/reportes/dashboard:
+    get:
+      operationId: v1_reportes_dashboard_retrieve
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/reportes/exportar:
+    get:
+      operationId: v1_reportes_exportar_retrieve
+      description: 'RF-32: exporta el reporte del período en CSV o PDF.'
+      parameters:
+      - in: query
+        name: desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: formato
+        schema:
+          type: string
+          enum:
+          - csv
+          - pdf
+      - in: query
+        name: hasta
+        schema:
+          type: string
+          format: date
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/reportes/periodo:
+    get:
+      operationId: v1_reportes_periodo_retrieve
+      parameters:
+      - in: query
+        name: desde
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: hasta
+        schema:
+          type: string
+          format: date
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/repuestos:
+    get:
+      operationId: v1_repuestos_list
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - in: query
+        name: categoria
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRepuestoList'
+          description: ''
+    post:
+      operationId: v1_repuestos_create
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepuestoCrearRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RepuestoCrearRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RepuestoCrearRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepuestoCrear'
+          description: ''
+  /api/v1/repuestos/{id}:
+    get:
+      operationId: v1_repuestos_retrieve
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+    put:
+      operationId: v1_repuestos_update
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+    patch:
+      operationId: v1_repuestos_partial_update
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRepuestoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRepuestoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRepuestoRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/repuestos/{id}/activar:
+    post:
+      operationId: v1_repuestos_activar_create
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/repuestos/{id}/desactivar:
+    post:
+      operationId: v1_repuestos_desactivar_create
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RepuestoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/repuestos/{id}/movimientos:
+    get:
+      operationId: v1_repuestos_movimientos_retrieve
+      description: 'RF-28: kardex del repuesto.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/repuestos/{id}/movimientos/registrar:
+    post:
+      operationId: v1_repuestos_movimientos_registrar_create
+      description: RF-26 a RF-29. Los repuestos se desactivan, no se eliminan.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este repuesto.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarMovimientoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegistrarMovimientoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegistrarMovimientoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/repuestos/alertas:
+    get:
+      operationId: v1_repuestos_alertas_retrieve
+      description: 'RF-29: repuestos con stock igual o inferior al mínimo.'
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repuesto'
+          description: ''
+  /api/v1/roles:
+    get:
+      operationId: v1_roles_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rol'
+          description: ''
+    post:
+      operationId: v1_roles_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rol'
+          description: ''
+  /api/v1/roles/{id}:
+    get:
+      operationId: v1_roles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este rol.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rol'
+          description: ''
+    put:
+      operationId: v1_roles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este rol.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RolRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rol'
+          description: ''
+    patch:
+      operationId: v1_roles_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este rol.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRolRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRolRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRolRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rol'
+          description: ''
+  /api/v1/salud:
+    get:
+      operationId: v1_salud_retrieve
+      description: 'Comprobación de vida para Docker: responde 200 si la base de datos
+        atiende.'
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/v1/tecnicos:
+    get:
+      operationId: v1_tecnicos_list
+      description: RF-06 y RF-07.
+      parameters:
+      - in: query
+        name: disponible
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tecnico'
+          description: ''
+    post:
+      operationId: v1_tecnicos_create
+      description: RF-06 y RF-07.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tecnico'
+          description: ''
+  /api/v1/tecnicos/{id}:
+    get:
+      operationId: v1_tecnicos_retrieve
+      description: RF-06 y RF-07.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este tecnico.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tecnico'
+          description: ''
+    put:
+      operationId: v1_tecnicos_update
+      description: RF-06 y RF-07.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este tecnico.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TecnicoRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tecnico'
+          description: ''
+    patch:
+      operationId: v1_tecnicos_partial_update
+      description: RF-06 y RF-07.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este tecnico.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTecnicoRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTecnicoRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTecnicoRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tecnico'
+          description: ''
+  /api/v1/usuarios:
+    get:
+      operationId: v1_usuarios_list
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: query
+        name: activo
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Un número de página dentro del conjunto de resultados paginado.
+        schema:
+          type: integer
+      - in: query
+        name: rol
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: Un término de búsqueda.
+        schema:
+          type: string
+      - name: tamano
+        required: false
+        in: query
+        description: Número de resultados a devolver por página.
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsuarioList'
+          description: ''
+    post:
+      operationId: v1_usuarios_create
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/v1/usuarios/{id}:
+    get:
+      operationId: v1_usuarios_retrieve
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+    put:
+      operationId: v1_usuarios_update
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+    patch:
+      operationId: v1_usuarios_partial_update
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioRequest'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/v1/usuarios/{id}/activar:
+    post:
+      operationId: v1_usuarios_activar_create
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/v1/usuarios/{id}/desactivar:
+    post:
+      operationId: v1_usuarios_desactivar_create
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+  /api/v1/usuarios/{id}/desbloquear:
+    post:
+      operationId: v1_usuarios_desbloquear_create
+      description: 'RF-03 y RF-04. No hay borrado físico: los usuarios se desactivan.'
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: Un valor de entero único que identifique este usuario.
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioRequest'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+          description: ''
+components:
+  schemas:
+    Actividad:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tecnico:
+          type: integer
+          readOnly: true
+        tecnico_nombre:
+          type: string
+          readOnly: true
+        descripcion:
+          type: string
+        fecha_inicio:
+          type: string
+          format: date-time
+        fecha_fin:
+          type: string
+          format: date-time
+          nullable: true
+        horas_empleadas:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+      required:
+      - descripcion
+      - horas_empleadas
+      - id
+      - tecnico
+      - tecnico_nombre
+    ActividadRequest:
+      type: object
+      properties:
+        descripcion:
+          type: string
+          minLength: 1
+        fecha_inicio:
+          type: string
+          format: date-time
+        fecha_fin:
+          type: string
+          format: date-time
+          nullable: true
+        horas_empleadas:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+      required:
+      - descripcion
+      - horas_empleadas
+    AgregarRepuestoRequest:
+      type: object
+      properties:
+        repuesto:
+          type: integer
+        cantidad:
+          type: integer
+          maximum: 1000
+          minimum: 1
+      required:
+      - cantidad
+      - repuesto
+    AprobacionRequest:
+      type: object
+      properties:
+        aprobado:
+          type: boolean
+        esperar_repuestos:
+          type: boolean
+          default: false
+        observacion:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - aprobado
+    AsignarTecnicoRequest:
+      type: object
+      properties:
+        tecnico:
+          type: integer
+      required:
+      - tecnico
+    BlankEnum:
+      enum:
+      - ''
+    CambioContrasenaRequest:
+      type: object
+      properties:
+        contrasena_actual:
+          type: string
+          minLength: 1
+        contrasena_nueva:
+          type: string
+          minLength: 12
+          maxLength: 128
+      required:
+      - contrasena_actual
+      - contrasena_nueva
+    CancelarRequest:
+      type: object
+      properties:
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+      - motivo
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tipo_documento:
+          $ref: '#/components/schemas/TipoDocumentoEnum'
+        numero_documento:
+          type: string
+          maxLength: 20
+        nombre:
+          type: string
+          maxLength: 150
+        telefono:
+          type: string
+          maxLength: 20
+        correo:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        direccion:
+          type: string
+          maxLength: 200
+        autoriza_datos:
+          type: boolean
+        fecha_autorizacion:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        activo:
+          type: boolean
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+        equipos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Equipo'
+          readOnly: true
+      required:
+      - activo
+      - creado_en
+      - equipos
+      - fecha_autorizacion
+      - id
+      - nombre
+      - numero_documento
+      - telefono
+      - tipo_documento
+    ClienteLista:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        tipo_documento:
+          $ref: '#/components/schemas/TipoDocumentoEnum'
+        numero_documento:
+          type: string
+          maxLength: 20
+        nombre:
+          type: string
+          maxLength: 150
+        telefono:
+          type: string
+          maxLength: 20
+        correo:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        activo:
+          type: boolean
+        total_equipos:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - nombre
+      - numero_documento
+      - telefono
+      - tipo_documento
+      - total_equipos
+    ClienteRequest:
+      type: object
+      properties:
+        tipo_documento:
+          $ref: '#/components/schemas/TipoDocumentoEnum'
+        numero_documento:
+          type: string
+          minLength: 1
+          maxLength: 20
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 150
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 20
+        correo:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        direccion:
+          type: string
+          maxLength: 200
+        autoriza_datos:
+          type: boolean
+      required:
+      - nombre
+      - numero_documento
+      - telefono
+      - tipo_documento
+    DiagnosticoRequest:
+      type: object
+      properties:
+        descripcion:
+          type: string
+          minLength: 1
+        causa_probable:
+          type: string
+        solucion_propuesta:
+          type: string
+          minLength: 1
+        costo_estimado:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - costo_estimado
+      - descripcion
+      - solucion_propuesta
+    EntregaRequest:
+      type: object
+      properties:
+        recibido_por:
+          type: string
+          minLength: 1
+          maxLength: 150
+        observacion:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - recibido_por
+    EnviarVerificacionRequest:
+      type: object
+      properties:
+        costo_mano_obra:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+    Equipo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cliente:
+          type: integer
+          readOnly: true
+        tipo:
+          type: string
+          maxLength: 40
+        marca:
+          type: string
+          maxLength: 60
+        modelo:
+          type: string
+          maxLength: 60
+        serial:
+          type: string
+          maxLength: 80
+        descripcion:
+          type: string
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+        total_ordenes:
+          type: integer
+          readOnly: true
+      required:
+      - cliente
+      - creado_en
+      - id
+      - marca
+      - modelo
+      - tipo
+      - total_ordenes
+    EquipoRequest:
+      type: object
+      properties:
+        tipo:
+          type: string
+          minLength: 1
+          maxLength: 40
+        marca:
+          type: string
+          minLength: 1
+          maxLength: 60
+        modelo:
+          type: string
+          minLength: 1
+          maxLength: 60
+        serial:
+          type: string
+          maxLength: 80
+        descripcion:
+          type: string
+      required:
+      - marca
+      - modelo
+      - tipo
+    EstadoOrdenEnum:
+      enum:
+      - RECIBIDA
+      - EN_DIAGNOSTICO
+      - PENDIENTE_APROBACION
+      - EN_ESPERA_REPUESTOS
+      - EN_REPARACION
+      - EN_VERIFICACION
+      - LISTA_PARA_ENTREGA
+      - ENTREGADA
+      - CANCELADA
+      type: string
+      description: |-
+        * `RECIBIDA` - Recibida
+        * `EN_DIAGNOSTICO` - En diagnóstico
+        * `PENDIENTE_APROBACION` - Pendiente de aprobación
+        * `EN_ESPERA_REPUESTOS` - En espera de repuestos
+        * `EN_REPARACION` - En reparación
+        * `EN_VERIFICACION` - En verificación
+        * `LISTA_PARA_ENTREGA` - Lista para entrega
+        * `ENTREGADA` - Entregada
+        * `CANCELADA` - Cancelada
+    EtapaEnum:
+      enum:
+      - RECEPCION
+      - DIAGNOSTICO
+      - REPARACION
+      - ENTREGA
+      type: string
+      description: |-
+        * `RECEPCION` - Recepción
+        * `DIAGNOSTICO` - Diagnóstico
+        * `REPARACION` - Reparación
+        * `ENTREGA` - Entrega
+    Foto:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        etapa:
+          $ref: '#/components/schemas/EtapaEnum'
+        etapa_nombre:
+          type: string
+          readOnly: true
+        descripcion:
+          type: string
+          maxLength: 200
+        ancho:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        alto:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        tamano_bytes:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        fecha:
+          type: string
+          format: date-time
+        subida_por_nombre:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          readOnly: true
+        url_miniatura:
+          type: string
+          readOnly: true
+      required:
+      - alto
+      - ancho
+      - etapa
+      - etapa_nombre
+      - id
+      - subida_por_nombre
+      - tamano_bytes
+      - url
+      - url_miniatura
+    Historial:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        estado_anterior:
+          oneOf:
+          - $ref: '#/components/schemas/EstadoOrdenEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        estado_nuevo:
+          $ref: '#/components/schemas/EstadoOrdenEnum'
+        observacion:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        usuario_nombre:
+          type: string
+          readOnly: true
+      required:
+      - estado_nuevo
+      - id
+      - usuario_nombre
+    LoginRequest:
+      type: object
+      properties:
+        correo:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        contrasena:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+      - contrasena
+      - correo
+    ObservacionRequest:
+      type: object
+      properties:
+        observacion:
+          type: string
+          default: ''
+          maxLength: 1000
+    OrdenCrear:
+      type: object
+      properties:
+        cliente:
+          type: integer
+        equipo:
+          type: integer
+        falla_reportada:
+          type: string
+          maxLength: 4000
+        accesorios:
+          type: string
+          maxLength: 2000
+        estado_fisico:
+          type: string
+          maxLength: 2000
+        prioridad:
+          allOf:
+          - $ref: '#/components/schemas/PrioridadEnum'
+          default: MEDIA
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        tecnico:
+          type: integer
+          nullable: true
+      required:
+      - cliente
+      - equipo
+      - falla_reportada
+    OrdenCrearRequest:
+      type: object
+      properties:
+        cliente:
+          type: integer
+        equipo:
+          type: integer
+        falla_reportada:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        accesorios:
+          type: string
+          maxLength: 2000
+        estado_fisico:
+          type: string
+          maxLength: 2000
+        prioridad:
+          allOf:
+          - $ref: '#/components/schemas/PrioridadEnum'
+          default: MEDIA
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        tecnico:
+          type: integer
+          nullable: true
+      required:
+      - cliente
+      - equipo
+      - falla_reportada
+    OrdenDetalle:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          maxLength: 20
+        cliente:
+          type: integer
+        cliente_nombre:
+          type: string
+          readOnly: true
+        equipo:
+          type: integer
+        equipo_resumen:
+          type: string
+          readOnly: true
+        tecnico:
+          type: integer
+          nullable: true
+        tecnico_nombre:
+          type: string
+          readOnly: true
+        estado:
+          $ref: '#/components/schemas/EstadoOrdenEnum'
+        estado_nombre:
+          type: string
+          readOnly: true
+        prioridad:
+          $ref: '#/components/schemas/PrioridadEnum'
+        fecha_recepcion:
+          type: string
+          format: date-time
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        fecha_entrega:
+          type: string
+          format: date-time
+          nullable: true
+        vencida:
+          type: boolean
+          readOnly: true
+        cliente_documento:
+          type: string
+          readOnly: true
+        cliente_telefono:
+          type: string
+          readOnly: true
+        equipo_serial:
+          type: string
+          readOnly: true
+        falla_reportada:
+          type: string
+        accesorios:
+          type: string
+        estado_fisico:
+          type: string
+        costo_mano_obra:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_repuestos:
+          type: string
+          readOnly: true
+        total:
+          type: string
+          readOnly: true
+        recibido_por:
+          type: string
+          maxLength: 150
+        motivo_cancelacion:
+          type: string
+        diagnostico:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          readOnly: true
+        historial:
+          type: array
+          items:
+            $ref: '#/components/schemas/Historial'
+          readOnly: true
+        actividades:
+          type: array
+          items:
+            $ref: '#/components/schemas/Actividad'
+          readOnly: true
+        repuestos:
+          type: array
+          items:
+            $ref: '#/components/schemas/RepuestoUtilizado'
+          readOnly: true
+        fotos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Foto'
+          readOnly: true
+        acciones:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - acciones
+      - actividades
+      - cliente
+      - cliente_documento
+      - cliente_nombre
+      - cliente_telefono
+      - codigo
+      - diagnostico
+      - equipo
+      - equipo_resumen
+      - equipo_serial
+      - estado_nombre
+      - falla_reportada
+      - fotos
+      - historial
+      - id
+      - repuestos
+      - tecnico_nombre
+      - total
+      - total_repuestos
+      - vencida
+    OrdenEditar:
+      type: object
+      properties:
+        prioridad:
+          $ref: '#/components/schemas/PrioridadEnum'
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        accesorios:
+          type: string
+        estado_fisico:
+          type: string
+        falla_reportada:
+          type: string
+      required:
+      - falla_reportada
+    OrdenEditarRequest:
+      type: object
+      properties:
+        prioridad:
+          $ref: '#/components/schemas/PrioridadEnum'
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        accesorios:
+          type: string
+        estado_fisico:
+          type: string
+        falla_reportada:
+          type: string
+          minLength: 1
+      required:
+      - falla_reportada
+    OrdenLista:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          maxLength: 20
+        cliente:
+          type: integer
+        cliente_nombre:
+          type: string
+          readOnly: true
+        equipo:
+          type: integer
+        equipo_resumen:
+          type: string
+          readOnly: true
+        tecnico:
+          type: integer
+          nullable: true
+        tecnico_nombre:
+          type: string
+          readOnly: true
+        estado:
+          $ref: '#/components/schemas/EstadoOrdenEnum'
+        estado_nombre:
+          type: string
+          readOnly: true
+        prioridad:
+          $ref: '#/components/schemas/PrioridadEnum'
+        fecha_recepcion:
+          type: string
+          format: date-time
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        fecha_entrega:
+          type: string
+          format: date-time
+          nullable: true
+        vencida:
+          type: boolean
+          readOnly: true
+      required:
+      - cliente
+      - cliente_nombre
+      - codigo
+      - equipo
+      - equipo_resumen
+      - estado_nombre
+      - id
+      - tecnico_nombre
+      - vencida
+    PaginatedClienteListaList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteLista'
+    PaginatedEquipoList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Equipo'
+    PaginatedOrdenListaList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrdenLista'
+    PaginatedRegistroAuditoriaList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegistroAuditoria'
+    PaginatedRepuestoList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Repuesto'
+    PaginatedUsuarioList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usuario'
+    PatchedClienteRequest:
+      type: object
+      properties:
+        tipo_documento:
+          $ref: '#/components/schemas/TipoDocumentoEnum'
+        numero_documento:
+          type: string
+          minLength: 1
+          maxLength: 20
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 150
+        telefono:
+          type: string
+          minLength: 1
+          maxLength: 20
+        correo:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        direccion:
+          type: string
+          maxLength: 200
+        autoriza_datos:
+          type: boolean
+    PatchedEquipoRequest:
+      type: object
+      properties:
+        tipo:
+          type: string
+          minLength: 1
+          maxLength: 40
+        marca:
+          type: string
+          minLength: 1
+          maxLength: 60
+        modelo:
+          type: string
+          minLength: 1
+          maxLength: 60
+        serial:
+          type: string
+          maxLength: 80
+        descripcion:
+          type: string
+    PatchedOrdenEditarRequest:
+      type: object
+      properties:
+        prioridad:
+          $ref: '#/components/schemas/PrioridadEnum'
+        fecha_estimada_entrega:
+          type: string
+          format: date
+          nullable: true
+        accesorios:
+          type: string
+        estado_fisico:
+          type: string
+        falla_reportada:
+          type: string
+          minLength: 1
+    PatchedRepuestoRequest:
+      type: object
+      properties:
+        codigo:
+          type: string
+          minLength: 1
+          maxLength: 30
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 60
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        stock_minimo:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedRolRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 50
+        descripcion:
+          type: string
+          maxLength: 200
+        permisos:
+          type: array
+          items:
+            type: string
+            minLength: 1
+    PatchedTecnicoRequest:
+      type: object
+      properties:
+        usuario:
+          type: integer
+        especialidad:
+          type: string
+          minLength: 1
+          maxLength: 80
+        telefono:
+          type: string
+          maxLength: 20
+        disponible:
+          type: boolean
+    PatchedUsuarioRequest:
+      type: object
+      properties:
+        nombre_completo:
+          type: string
+          minLength: 1
+          maxLength: 120
+        correo:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        rol:
+          type: integer
+        contrasena:
+          type: string
+          writeOnly: true
+          minLength: 12
+          maxLength: 128
+    Perfil:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_completo:
+          type: string
+          maxLength: 120
+        correo:
+          type: string
+          format: email
+          maxLength: 254
+        rol:
+          type: string
+        permisos:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        tecnico_id:
+          type: integer
+          nullable: true
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+          title: Último acceso
+      required:
+      - correo
+      - id
+      - nombre_completo
+      - permisos
+      - rol
+      - tecnico_id
+    Permiso:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          maxLength: 60
+        descripcion:
+          type: string
+          maxLength: 200
+      required:
+      - codigo
+      - id
+    PrioridadEnum:
+      enum:
+      - BAJA
+      - MEDIA
+      - ALTA
+      type: string
+      description: |-
+        * `BAJA` - Baja
+        * `MEDIA` - Media
+        * `ALTA` - Alta
+    RegistrarMovimientoRequest:
+      type: object
+      properties:
+        tipo:
+          $ref: '#/components/schemas/TipoEnum'
+        cantidad:
+          type: integer
+          maximum: 100000
+          minimum: -100000
+        motivo:
+          type: string
+          minLength: 1
+          maxLength: 200
+      required:
+      - cantidad
+      - motivo
+      - tipo
+    RegistroAuditoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        fecha:
+          type: string
+          format: date-time
+          readOnly: true
+        usuario:
+          type: integer
+          nullable: true
+        usuario_nombre:
+          type: string
+          readOnly: true
+        accion:
+          type: string
+          maxLength: 60
+        entidad:
+          type: string
+          maxLength: 60
+        entidad_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        ip:
+          type: string
+          nullable: true
+        detalle:
+          nullable: true
+      required:
+      - accion
+      - entidad
+      - fecha
+      - id
+      - usuario_nombre
+    Repuesto:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          maxLength: 30
+        nombre:
+          type: string
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 60
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        stock_actual:
+          type: integer
+          readOnly: true
+        stock_minimo:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        activo:
+          type: boolean
+          readOnly: true
+        bajo_minimo:
+          type: boolean
+          readOnly: true
+      required:
+      - activo
+      - bajo_minimo
+      - codigo
+      - id
+      - nombre
+      - precio_unitario
+      - stock_actual
+    RepuestoCrear:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        codigo:
+          type: string
+          maxLength: 30
+        nombre:
+          type: string
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 60
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        stock_actual:
+          type: integer
+          readOnly: true
+        stock_minimo:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        activo:
+          type: boolean
+          readOnly: true
+        bajo_minimo:
+          type: boolean
+          readOnly: true
+      required:
+      - activo
+      - bajo_minimo
+      - codigo
+      - id
+      - nombre
+      - precio_unitario
+      - stock_actual
+    RepuestoCrearRequest:
+      type: object
+      properties:
+        codigo:
+          type: string
+          minLength: 1
+          maxLength: 30
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 60
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        stock_minimo:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        stock_inicial:
+          type: integer
+          minimum: 0
+          writeOnly: true
+          default: 0
+      required:
+      - codigo
+      - nombre
+      - precio_unitario
+    RepuestoRequest:
+      type: object
+      properties:
+        codigo:
+          type: string
+          minLength: 1
+          maxLength: 30
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 120
+        categoria:
+          type: string
+          maxLength: 60
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        stock_minimo:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - codigo
+      - nombre
+      - precio_unitario
+    RepuestoUtilizado:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        repuesto:
+          type: integer
+        codigo:
+          type: string
+          readOnly: true
+        nombre:
+          type: string
+          readOnly: true
+        cantidad:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,12}(?:\.\d{0,2})?$
+          readOnly: true
+        fecha:
+          type: string
+          format: date-time
+      required:
+      - cantidad
+      - codigo
+      - id
+      - nombre
+      - precio_unitario
+      - repuesto
+      - subtotal
+    Rol:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 50
+        descripcion:
+          type: string
+          maxLength: 200
+        permisos:
+          type: array
+          items:
+            type: string
+        total_usuarios:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - nombre
+      - permisos
+      - total_usuarios
+    RolRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 50
+        descripcion:
+          type: string
+          maxLength: 200
+        permisos:
+          type: array
+          items:
+            type: string
+            minLength: 1
+      required:
+      - nombre
+      - permisos
+    SubirFotoRequest:
+      type: object
+      properties:
+        archivo:
+          type: string
+          format: binary
+        descripcion:
+          type: string
+          default: ''
+          maxLength: 200
+      required:
+      - archivo
+    Tecnico:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        usuario:
+          type: integer
+        nombre:
+          type: string
+          readOnly: true
+        correo:
+          type: string
+          readOnly: true
+        especialidad:
+          type: string
+          maxLength: 80
+        telefono:
+          type: string
+          maxLength: 20
+        disponible:
+          type: boolean
+        ordenes_activas:
+          type: integer
+          readOnly: true
+      required:
+      - correo
+      - especialidad
+      - id
+      - nombre
+      - ordenes_activas
+      - usuario
+    TecnicoRequest:
+      type: object
+      properties:
+        usuario:
+          type: integer
+        especialidad:
+          type: string
+          minLength: 1
+          maxLength: 80
+        telefono:
+          type: string
+          maxLength: 20
+        disponible:
+          type: boolean
+      required:
+      - especialidad
+      - usuario
+    TipoDocumentoEnum:
+      enum:
+      - CC
+      - CE
+      - NIT
+      - PAS
+      type: string
+      description: |-
+        * `CC` - Cédula de ciudadanía
+        * `CE` - Cédula de extranjería
+        * `NIT` - NIT
+        * `PAS` - Pasaporte
+    TipoEnum:
+      enum:
+      - ENTRADA
+      - AJUSTE
+      - DEVOLUCION
+      type: string
+      description: |-
+        * `ENTRADA` - Entrada
+        * `AJUSTE` - Ajuste
+        * `DEVOLUCION` - Devolución
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre_completo:
+          type: string
+          maxLength: 120
+        correo:
+          type: string
+          format: email
+          maxLength: 254
+        rol:
+          type: integer
+        rol_nombre:
+          type: string
+          readOnly: true
+        activo:
+          type: boolean
+          readOnly: true
+        es_tecnico:
+          type: boolean
+          readOnly: true
+        bloqueado_hasta:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          title: Último acceso
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - activo
+      - bloqueado_hasta
+      - correo
+      - creado_en
+      - es_tecnico
+      - id
+      - last_login
+      - nombre_completo
+      - rol
+      - rol_nombre
+    UsuarioRequest:
+      type: object
+      properties:
+        nombre_completo:
+          type: string
+          minLength: 1
+          maxLength: 120
+        correo:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        rol:
+          type: integer
+        contrasena:
+          type: string
+          writeOnly: true
+          minLength: 12
+          maxLength: 128
+      required:
+      - correo
+      - nombre_completo
+      - rol
+    VerificacionRequest:
+      type: object
+      properties:
+        aprobada:
+          type: boolean
+        observacion:
+          type: string
+          default: ''
+          maxLength: 1000
+      required:
+      - aprobada
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sigeser_sesion
+      description: Cookie de sesión obtenida en POST /api/v1/auth/login. Las operaciones
+        que modifican datos exigen además la cabecera X-CSRFToken con el valor de
+        la cookie sigeser_csrf.

@@ -1,0 +1,11 @@
+# Dependencias de producción (versiones fijadas para reproducibilidad)
+Django==5.2.19
+djangorestframework==3.18.3
+django-filter==26.2
+drf-spectacular==0.30.0
+drf-spectacular-sidecar==2026.10.1
+argon2-cffi==25.1.0
+psycopg[binary]==3.3.8
+gunicorn==26.2.0
+reportlab==5.1.0
+Pillow==13.0.0
